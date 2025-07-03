@@ -16,17 +16,17 @@ datasource db {
 // Bagian Akun
 
 model User {
-  id Int @id @default(autoincrement())
-  email String @unique
-  password String
-  username String @unique
-  nomorWhatsapp String @unique @map("nomor_whatsapp")
-  programStudi String @map("program_studi")
-  createdAt DateTime @default(now()) @map("created_at")
+  id            Int      @id @default(autoincrement())
+  email         String   @unique
+  password      String
+  username      String   @unique
+  nomorWhatsapp String   @unique @map("nomor_whatsapp")
+  programStudi  String   @map("program_studi")
+  createdAt     DateTime @default(now()) @map("created_at")
 
   // Relationships
   transactions Transaction[]
-  cartItems CartItem[]
+  cartItems    CartItem[]
 
   @@map("users")
 }
@@ -34,76 +34,74 @@ model User {
 // Bagian Produk
 
 model Product {
-  id Int @id @default(autoincrement())
-  name String
+  id          Int     @id @default(autoincrement())
+  name        String
   description String?
+  imageUrl    String  @map("image_url")
 
   variants ProductVariant[]
 
-  @@map("milk")
+  @@map("product")
 }
 
 model ProductVariant {
-  id Int @id @default(autoincrement())
-  productId Int @map("product_id")
-  name String
-  price Decimal
-  imageUrl String? @map("image_url")
+  id        Int     @id @default(autoincrement())
+  productId Int     @map("product_id")
+  name      String
+  price     Decimal
+  imageUrl  String? @map("image_url")
 
   //Relationship
-  product Product @relation(fields:[productId], references: [id])
-  cartItems CartItem[]
+  product            Product             @relation(fields: [productId], references: [id])
+  cartItems          CartItem[]
   transactionDetails TransactionDetail[]
 
-  @@map("milk_variant")
+  @@map("product_variant")
 }
 
 //Bagian Transaksi
 
 model Transaction {
-  id Int @id @default(autoincrement())
-  userId Int @map("user_id")
+  id              Int      @id @default(autoincrement())
+  userId          Int      @map("user_id")
   transactionDate DateTime @default(now()) @map("transaction_date")
-  totalAmount Decimal @map("total_amount")
-  status String
-  paymentMethod String @map("payment_method")
+  totalAmount     Decimal  @map("total_amount")
+  status          String
+  paymentMethod   String   @map("payment_method")
 
   // Relationships
-  user User @relation(fields: [userId], references: [id])
+  user    User                @relation(fields: [userId], references: [id])
   details TransactionDetail[]
 
-  @@map("transaction") 
+  @@map("transaction")
 }
 
 model TransactionDetail {
-  id Int @id @default(autoincrement())
-  transactionId Int @map("transaction_id")
-  variantId Int @map("variant_id")
-  quantity Int
-  price Decimal
-  subTotal Decimal
+  id            Int     @id @default(autoincrement())
+  transactionId Int     @map("transaction_id")
+  variantId     Int     @map("variant_id")
+  quantity      Int
+  price         Decimal
+  subTotal      Decimal
 
   //Relationship
-  transaction Transaction @relation(fields: [transactionId], references: [id])
-  milk ProductVariant @relation(fields: [variantId], references: [id])
+  transaction Transaction    @relation(fields: [transactionId], references: [id])
+  milk        ProductVariant @relation(fields: [variantId], references: [id])
 
   @@map("transaction_detail")
 }
 
-
 // Bagian Keranjang
 
 model CartItem {
-  id Int @id @default(autoincrement())
-  userId Int @map("user_id")
-  variantId Int @map("variant_id")
-  quantity Int
-  isSelected Boolean @default(true)
-  addedAt DateTime @default(now()) @map("added_at")
+  id         Int      @id @default(autoincrement())
+  userId     Int      @map("user_id")
+  variantId  Int      @map("variant_id")
+  quantity   Int
+  isSelected Boolean  @default(true)
+  addedAt    DateTime @default(now()) @map("added_at")
 
   // Relationship
-  user User @relation(fields: [userId], references: [id])
+  user    User           @relation(fields: [userId], references: [id])
   variant ProductVariant @relation(fields: [variantId], references: [id])
-
 }
-
