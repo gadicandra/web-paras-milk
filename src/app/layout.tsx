@@ -1,7 +1,6 @@
 import { Open_Sans } from "next/font/google";
 import "./globals.css";
 import NavBar from "@/app/navbar/Navbar";
-import Footer from "@/app/Footer";
 import SessionProvider from "./SessionProvider";
 
 const openSans = Open_Sans({
@@ -26,7 +25,6 @@ export default function RootLayout({
                 <SessionProvider>
                     <NavBar/>
                     <main className="p-0 max-w-7xl m-auto">{children}</main>
-                    <Footer />
                 </SessionProvider>
             </body>
         </html>
