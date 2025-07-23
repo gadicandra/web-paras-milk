@@ -6,9 +6,9 @@ import { getUniqueFlavors, getUniqueSize } from "../../../../lib/data";
 import DynamicPage from "./DynamicPage";
 
 interface ProductPageProps {
-  params: {
-    id: number;
-  };
+  params: Promise<{
+    id: string;
+  }>;
 }
 
 const getProduct = cache(async (id: number) => {
@@ -17,11 +17,9 @@ const getProduct = cache(async (id: number) => {
   return product;
 });
 
-export async function generateMetadata({
-  params,
-}: ProductPageProps): Promise<Metadata> {
-  const param = await params;
-  const numId = Number(param.id);
+export async function generateMetadata({ params }: ProductPageProps): Promise<Metadata> {
+  const { id } = await params
+  const numId = Number(id);
   const variant = await getProduct(numId);
   return {
     title: variant.name,
@@ -30,8 +28,8 @@ export async function generateMetadata({
 }
 
 export default async function ProductPage({ params }: ProductPageProps) {
-  const param = await params;
-  const numId = Number(param.id);
+  const { id } = await params;
+  const numId = Number(id);
   const product = await getProduct(numId);
   const flavor = await getUniqueFlavors(numId);
   const size = await getUniqueSize(numId);

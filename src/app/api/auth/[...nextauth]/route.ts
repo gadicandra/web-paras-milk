@@ -1,32 +1,6 @@
-import { PrismaAdapter } from "@auth/prisma-adapter";
-import NextAuth, { NextAuthOptions } from "next-auth";
-import { prisma } from "../../../../../lib/prisma";
-import { Adapter } from "next-auth/adapters";
-import GoogleProvider from "next-auth/providers/google";
-import { env } from "../../../../../lib/env";
-import { mergeAnonymousCartIntoUserCart } from "../../../../../lib/cart";
-import { PrismaClient } from "@prisma/client";
+import NextAuth from "next-auth";
+import { authOptions } from "../../../../../lib/auth";
 
-export const authOptions: NextAuthOptions ={
-    adapter: PrismaAdapter(prisma as PrismaClient) as Adapter,
-    providers: [
-        GoogleProvider({
-            clientId: env.GOOGLE_CLIENT_ID,
-            clientSecret: env.GOOGLE_CLIENT_SECRET
-        })
-    ],
-    callbacks: {
-        session({session, user}) {
-            session.user.id = user.id
-            return session
-        },
-    },
-    events: {
-        async signIn({user}){
-            await mergeAnonymousCartIntoUserCart(user.id);
-        }
-    }
-}
 
 const handler = NextAuth(authOptions);
 

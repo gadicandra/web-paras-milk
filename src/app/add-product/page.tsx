@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { prisma } from "../../../lib/prisma";
 import FormSubmitButton from "@/components/FormSubmitButton";
-import { authOptions } from "../api/auth/[...nextauth]/route";
+import { authOptions } from "../../../lib/auth";
 
 export const metadata = {
   title: "Add Product - Paras Milk"
