@@ -1,4 +1,14 @@
-import "./globals.css"
+import { Open_Sans } from "next/font/google";
+import "./globals.css";
+import NavBar from "@/app/navbar/Navbar";
+import Footer from "@/app/Footer";
+import SessionProvider from "./SessionProvider";
+
+const openSans = Open_Sans({
+  subsets: ['latin'],
+  weight: ['400'], 
+  variable: '--font-open-sans',
+});
 
 export const metadata = {
     title: "Paras Milk Website"
@@ -11,10 +21,13 @@ export default function RootLayout({
 }) {
     return (
         <html lang="en">
-            <body>
-                <main className="p-4 max-w-7xl m-auto">
-                {children}
-                </main>
+
+            <body className={`${openSans.variable} font-sans`}>
+                <SessionProvider>
+                    <NavBar/>
+                    <main className="p-0 max-w-7xl m-auto">{children}</main>
+                    <Footer />
+                </SessionProvider>
             </body>
         </html>
     )

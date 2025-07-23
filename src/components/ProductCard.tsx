@@ -1,4 +1,4 @@
-import { Product, ProductVariant } from "@prisma/client"
+import { Product } from "@prisma/client"
 import Link from "next/link"
 import Image from "next/image"
 
@@ -16,9 +16,9 @@ export default function ProductCard({product}: ProductCardProps){
                 <Image 
                 src={product.imageUrl}
                 alt={product.name}
-                width={800}
-                height={400}
-                className="h-[100px] object-cover"
+                width={400}
+                height={800}
+                className=" h-32 w-16 object-cover"
                 />
             </figure>
             <div className="card-body">

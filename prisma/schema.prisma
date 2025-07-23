@@ -13,24 +13,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Bagian Akun
-
-model User {
-  id            Int      @id @default(autoincrement())
-  email         String   @unique
-  password      String
-  username      String   @unique
-  nomorWhatsapp String   @unique @map("nomor_whatsapp")
-  programStudi  String   @map("program_studi")
-  createdAt     DateTime @default(now()) @map("created_at")
-
-  // Relationships
-  transactions Transaction[]
-  cartItems    CartItem[]
-
-  @@map("users")
-}
-
 // Bagian Produk
 
 model Product {
@@ -48,8 +30,9 @@ model ProductVariant {
   id        Int     @id @default(autoincrement())
   productId Int     @map("product_id")
   name      String
-  price     Decimal
+  price     Int
   imageUrl  String? @map("image_url")
+  attributes Json
 
   //Relationship
   product            Product             @relation(fields: [productId], references: [id])
@@ -63,14 +46,12 @@ model ProductVariant {
 
 model Transaction {
   id              Int      @id @default(autoincrement())
-  userId          Int      @map("user_id")
   transactionDate DateTime @default(now()) @map("transaction_date")
-  totalAmount     Decimal  @map("total_amount")
+  totalAmount     Int      @map("total_amount")
   status          String
   paymentMethod   String   @map("payment_method")
 
   // Relationships
-  user    User                @relation(fields: [userId], references: [id])
   details TransactionDetail[]
 
   @@map("transaction")
@@ -93,15 +74,100 @@ model TransactionDetail {
 
 // Bagian Keranjang
 
+model Cart {
+  id        Int      @id @default(autoincrement())
+  userId    String?   @map("user_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  //Relationship
+  user  User?      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items CartItem[]
+
+  @@map("carts")
+}
+
 model CartItem {
-  id         Int      @id @default(autoincrement())
-  userId     Int      @map("user_id")
-  variantId  Int      @map("variant_id")
+  id         Int     @id @default(autoincrement())
+  cartId     Int
+  variantId  Int     @map("variant_id")
   quantity   Int
-  isSelected Boolean  @default(true)
-  addedAt    DateTime @default(now()) @map("added_at")
+  isSelected Boolean @default(true)
 
   // Relationship
-  user    User           @relation(fields: [userId], references: [id])
-  variant ProductVariant @relation(fields: [variantId], references: [id])
+  cart    Cart           @relation(fields: [cartId], references: [id])
+  variant ProductVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
+
+  @@map("cart_items")
+}
+
+model User {
+  id            String          @id @default(cuid())
+  name          String?
+  email         String          @unique
+  emailVerified DateTime?
+  image         String?
+  accounts      Account[]
+  sessions      Session[]
+  // Optional for WebAuthn support
+  Authenticator Authenticator[]
+  Cart          Cart[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Account {
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([provider, providerAccountId])
+}
+
+model Session {
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@id([identifier, token])
+}
+
+// Optional for WebAuthn support
+model Authenticator {
+  credentialID         String  @unique
+  userId               String
+  providerAccountId    String
+  credentialPublicKey  String
+  counter              Int
+  credentialDeviceType String
+  credentialBackedUp   Boolean
+  transports           String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, credentialID])
 }
