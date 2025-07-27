@@ -5,6 +5,7 @@ import ShoppingCartButton from "./ShoppingCartButton";
 import UserMenuButton from "./UserMenuButton";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../../../lib/auth";
+import Sidebar from "./sidebar";
 
 export default async function NavBar(){
     const session = await getServerSession(authOptions);
@@ -12,6 +13,9 @@ export default async function NavBar(){
     return(
         <div className="bg-base-100">
             <div className="navbar max-w-7xl m-auto flex-col sm:flex-row">
+                <div className="flex-none">
+                    <Sidebar/>
+                </div>
                 <div className="flex-1">
                     <Link href="/" className="btn btn-ghost">
                         <Image src={"/logo/logo_paras.png"} height={40} width={40} alt="Paras Logo" />

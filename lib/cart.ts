@@ -65,8 +65,6 @@ export async function createCart(): Promise<ShoppingCart>{
         (await cookies()).set("localCartId", newCart.id.toString())
     }
 
-    
-
     (await cookies()).set("localCartId", newCart.id.toString())
 
     return{
