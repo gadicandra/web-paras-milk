@@ -24,7 +24,7 @@ export default async function CartPage(){
             <p className="mb-3 font-bold">
                 Total: {formatPrice(cart?.subtotal || 0)}
             </p>
-            <Checkout/>
+            <Checkout cart={cart}/>
         </div>
     </div>)
 }

@@ -1,13 +1,6 @@
 import Midtrans from "midtrans-client-typescript"
 import { NextRequest, NextResponse } from "next/server";
-
-interface PaymentRequestBody{
-    id: string;
-    productName: string;
-    price: number;
-    quantity: number;
-}
-
+import { ShoppingCart } from "../../../../lib/cart";
 
 const snap = new Midtrans.Snap({
     isProduction: false,
@@ -16,18 +9,34 @@ const snap = new Midtrans.Snap({
 })
 
 export async function POST(request: NextRequest) {
-    const body: PaymentRequestBody = await request.json()
-    const {id, productName, price, quantity} = body;
+    const body: ShoppingCart = await request.json()
 
+    function createItemDetails(body: ShoppingCart){
+        let totalAmount = 0;
+        const cartId = body.items[0].id
+
+        const itemDetails = body.items.map(product => {
+            const { variant, quantity} = product
+            const subtotal = variant.price * quantity;
+            totalAmount += subtotal;
+
+            return{
+                id: variant.id.toString(),
+                name: variant.name,
+                price: variant.price,
+                quantity: quantity
+            }
+        })
+
+        return { cartId, itemDetails, totalAmount }
+    }
+
+    const { cartId, itemDetails, totalAmount } = createItemDetails(body)
     const parameter = {
-        item_details: {
-            name: productName,
-            price: price,
-            quantity: quantity
-        },
+        item_details: itemDetails,
         transaction_details: {
-            order_id: id,
-            gross_amount: price * quantity
+            order_id: cartId,
+            gross_amount: totalAmount
         }
     }
 

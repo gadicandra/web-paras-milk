@@ -1,23 +1,14 @@
 'use client';
 
 import { useState } from "react";
-import { product } from "../../../lib/product"
+import { ShoppingCart } from "../../../lib/cart";
 
-export default function Checkout(){
+export default function Checkout({ cart }: { cart: ShoppingCart | null }){
     const [loading, setLoading] = useState(false);
-
 
     const handleCheckout = () => {
         const processPayment = async () => {
             setLoading(true);
-
-            const data = {
-                id: product.id,
-                productName: product.name,
-                price: product.price,
-                quantity: product.quantity
-            };
-            console.log('Sending data:', data);
 
             try {
                 const response = await fetch("/api/tokenizer", {
@@ -25,7 +16,7 @@ export default function Checkout(){
                     headers: {
                         "Content-Type": "application/json",
                     },
-                    body: JSON.stringify(data)
+                    body: JSON.stringify(cart)
                 });
 
                 console.log('Response status:', response.status)
