@@ -30,7 +30,7 @@ interface ErrorResponse {
 
 interface TransactionStatusRequest extends NextApiRequest{
     query: {
-        id: string;
+        transactionId: string;
     }
 }
 
@@ -42,9 +42,9 @@ export default async function handler(
         return res.status(405).json({ message: 'Method not allowed '});
     }
 
-    const { id } = req.query;
+    const { transactionId } = req.query;
 
-    if(!id || typeof id !== 'string'){
+    if(!transactionId || typeof transactionId !== 'string'){
         return res.status(400).json({ message: 'Transaction ID is required' });
     }
 
@@ -58,8 +58,8 @@ export default async function handler(
 
         const authString = Buffer.from(serverKey + ':').toString('base64');
         const midtransUrl = isProduction
-            ? `https://api.midtrans.com/v2/${id}/status`
-            : `https://api.sandbox.midtrans.com/v2/${id}/status`;
+            ? `https://api.midtrans.com/v2/${transactionId}/status`
+            : `https://api.sandbox.midtrans.com/v2/${transactionId}/status`;
 
         const response: AxiosResponse<MidtransStatusResponse> = await axios.get(midtransUrl, {
             headers:{
