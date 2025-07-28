@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { ShoppingCart } from "../../../../lib/cart";
 
 const snap = new Midtrans.Snap({
-    isProduction: false,
+    isProduction: Boolean(process.env.MIDTRANS_IS_PRODUCTION),
     serverKey: process.env.SECRET,
     clientKey: process.env.NEXT_PUBLIC_CLIENT
 })
@@ -51,6 +51,11 @@ export async function POST(request: NextRequest) {
         }
         return NextResponse.json({ token })
     } catch (error){
-        console.log(error);
+        console.error("Error creating Midtrans token:", error);
+        const errorMessage = error instanceof Error ? error.message : "Unknown error";
+        return NextResponse.json(
+            { message: "Failed to create payment token", error: errorMessage },
+            { status: 500 } // Gunakan status 500 (Internal Server Error)
+        );
     }
 }

@@ -1,29 +1,27 @@
 import axios, { AxiosResponse } from "axios";
-import { NextApiRequest, NextApiResponse } from "next";
-import { MidtransStatusResponse } from "../../../../@types/midtrans";
-
+import { MidtransStatusResponse } from "../../../../../@types/midtrans";
+import { NextRequest, NextResponse } from "next/server";
 
 interface ErrorResponse {
     message: string;
     error?: string | Record<string, unknown>
 }
 
-export default async function handler(
-    req: NextApiRequest,
-    res: NextApiResponse<MidtransStatusResponse | ErrorResponse>
-): Promise<void> {
-    if (req.method !== 'GET') {
-        return res.status(405).json({ message: 'Method not allowed' });
-    }
-
+export async function GET(
+    req: NextRequest,
+    { params }: {params : Promise<{transactionId: string}>}
+): Promise<NextResponse<MidtransStatusResponse | ErrorResponse>> {
     console.log('=== TRANSACTION STATUS API START ===');
     
-    const { transactionId } = req.query;
+    const { transactionId }  = await params;
     console.log('Transaction ID:', transactionId);
 
-    if (!transactionId || typeof transactionId !== 'string') {
+    if (!transactionId) {
         console.error('No transaction ID provided');
-        return res.status(400).json({ message: 'Transaction ID is required' });
+        return NextResponse.json(
+            { message: 'Transaction ID is required' },
+            { status: 400}
+        );
     }
 
     try {
@@ -58,8 +56,7 @@ export default async function handler(
         console.log("Midtrans status response:", response.data);
         console.log('=== TRANSACTION STATUS SUCCESS ===');
 
-        const transactionData: MidtransStatusResponse = response.data;
-        res.status(200).json(transactionData);
+        return NextResponse.json(response.data);
 
     } catch (error) {
         console.error('=== TRANSACTION STATUS ERROR ===');
@@ -74,52 +71,39 @@ export default async function handler(
             
             if (error.response) {
                 const errorData = error.response.data as Record<string, unknown>;
-                res.status(error.response.status).json({
+                return NextResponse.json({
                     message: "Failed to get transaction status",
                     error: errorData
+                },
+                {
+                    status: error.response.status
                 });
             } else if (error.code === 'ECONNABORTED') {
-                res.status(408).json({
+                return NextResponse.json({
                     message: 'Request timeout',
                     error: 'The request to Midtrans timed out'
+                },
+                {
+                    status: 408
                 });
             } else {
-                res.status(500).json({
+                return NextResponse.json({
                     message: 'Network error',
                     error: error.message
+                },
+                {
+                    status: 500
                 });
             }
         } else {
             console.error('Non-axios error:', error);
-            res.status(500).json({
+            return NextResponse.json({
                 message: 'Internal server error',
                 error: error instanceof Error ? error.message : "Unknown error"
+            },
+            {
+                status: 500
             });
         }
     }
 }
-
-// Utility functions for type-safe status checking
-export const isSuccessfulTransaction = (status: string): boolean => {
-    return status === 'capture' || status === 'settlement';
-};
-
-export const isPendingTransaction = (status: string): boolean => {
-    return status === 'pending';
-};
-
-export const isFailedTransaction = (status: string): boolean => {
-    return ['deny', 'cancel', 'expire', 'failure'].includes(status);
-};
-
-// Type guard function
-export const isMidtransStatusResponse = (obj: unknown): obj is MidtransStatusResponse => {
-    return (
-        typeof obj === 'object' &&
-        obj !== null &&
-        typeof (obj as Record<string, unknown>).status_code === 'string' &&
-        typeof (obj as Record<string, unknown>).transaction_id === 'string' &&
-        typeof (obj as Record<string, unknown>).order_id === 'string' &&
-        typeof (obj as Record<string, unknown>).transaction_status === 'string'
-    );
-};
