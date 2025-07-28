@@ -9,38 +9,46 @@ const snap = new Midtrans.Snap({
 })
 
 export async function POST(request: NextRequest) {
-    const body: ShoppingCart = await request.json()
+    try{
+        const body: ShoppingCart = await request.json()
 
-    function createItemDetails(body: ShoppingCart){
-        let totalAmount = 0;
-        const cartId = body.items[0].id
+        function createItemDetails(body: ShoppingCart){
+            let totalAmount = 0;
+            const cartId = body.items[0].id
 
-        const itemDetails = body.items.map(product => {
-            const { variant, quantity} = product
-            const subtotal = variant.price * quantity;
-            totalAmount += subtotal;
+            const itemDetails = body.items.map(product => {
+                const { variant, quantity} = product
+                const subtotal = variant.price * quantity;
+                totalAmount += subtotal;
 
-            return{
-                id: variant.id.toString(),
-                name: variant.name,
-                price: variant.price,
-                quantity: quantity
-            }
-        })
+                return{
+                    id: variant.id.toString(),
+                    name: variant.name,
+                    price: variant.price,
+                    quantity: quantity
+                }
+            })
 
-        return { cartId, itemDetails, totalAmount }
-    }
-
-    const { cartId, itemDetails, totalAmount } = createItemDetails(body)
-    const parameter = {
-        item_details: itemDetails,
-        transaction_details: {
-            order_id: cartId,
-            gross_amount: totalAmount
+            return { cartId, itemDetails, totalAmount }
         }
-    }
 
-    const token = await snap.createTransactionToken(parameter);
-    console.log(token)
-    return NextResponse.json({ token })
+        const { cartId, itemDetails, totalAmount } = createItemDetails(body)
+        const parameter = {
+            item_details: itemDetails,
+            transaction_details: {
+                order_id: cartId,
+                gross_amount: totalAmount
+            }
+        }
+
+        const token = await snap.createTransactionToken(parameter);
+        console.log(token)
+
+        if (!token) {
+            throw new Error('No token received from Midtrans');
+        }
+        return NextResponse.json({ token })
+    } catch (error){
+        console.log(error);
+    }
 }
