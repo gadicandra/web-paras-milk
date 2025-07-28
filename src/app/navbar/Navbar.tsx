@@ -6,9 +6,14 @@ import UserMenuButton from "./UserMenuButton";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../../../lib/auth";
 import Sidebar from "./sidebar";
+import { redirect } from "next/navigation";
 
 export default async function NavBar(){
     const session = await getServerSession(authOptions);
+    const user = session?.user
+    if(!user){
+        redirect("/api/auth/signin")
+    }
     const cart = await getCart();
     return(
         <div className="bg-base-100">
