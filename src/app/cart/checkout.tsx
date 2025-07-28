@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { ShoppingCart } from "../../../lib/cart";
 import { MidtransStatusResponse, SnapTransactionResult } from "../../../@types/midtrans";
 import { executeCallback, getPaymentStatusGroup, validateMidtransResponse } from "../../../utils/midtrans";
@@ -8,22 +8,30 @@ import { executeCallback, getPaymentStatusGroup, validateMidtransResponse } from
 export default function Checkout({ cart }: { cart: ShoppingCart | null }){
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string|null>(null);
+    const processingRef = useRef(false);
 
     const handleSnapCallBack = (
         result: SnapTransactionResult,
         callbackType: 'success' | "pending"
     ): void => {
+        if(processingRef.current){
+            console.log("Already processing, ignoring duplicate callback")
+            return;
+        }
         console.log(`Payment ${callbackType}:`, result);
+        processingRef.current = true;
         const transactionId = result.order_id || result.transaction_id;
         if(transactionId && typeof transactionId === "string"){
             checkTransactionStatus(transactionId);
         } else {
             setError('No transaction ID received from payment gateway');
             setLoading(false);
+            processingRef.current = false;
         }
     }
 
     const handleCheckout = () => {
+        processingRef.current = false
         const processPayment = async (): Promise<void> => {
             setLoading(true);
             setError(null);
@@ -82,10 +90,12 @@ export default function Checkout({ cart }: { cart: ShoppingCart | null }){
                         console.log("Payment error:", snapResult)
                         setError("Payment failed. Please try again.");
                         setLoading(false);
+                        processingRef.current = false;
                     },
                     onClose: () => {
                         console.log('Payment popup closed');
                         setLoading(false)
+                        processingRef.current = false;
                     }
                 })
             } catch(err){
@@ -112,6 +122,7 @@ export default function Checkout({ cart }: { cart: ShoppingCart | null }){
                 console.log("Final error message:", errorMessage);
                 setError(errorMessage);
                 setLoading(false);
+                processingRef.current = false;
             } finally {
                 console.log("=== CHECKOUT DEBUG END ===");
             }
@@ -143,6 +154,8 @@ export default function Checkout({ cart }: { cart: ShoppingCart | null }){
             const errorMessage = err instanceof Error ? err.message : 'Failed to check transaction status';
             console.error('Status check error:', errorMessage);
             setError(errorMessage);
+            setLoading(false);
+            processingRef.current = false;
         } finally {
             setLoading(false);
         }
@@ -167,23 +180,31 @@ export default function Checkout({ cart }: { cart: ShoppingCart | null }){
             default:
                 console.log('Unknown payment status:', result.transaction_status);
                 setError(`Unknown payment status: ${result.transaction_status}`);
+                setLoading(false);
+                processingRef.current = false;
         }
     };
 
     const onPaymentSuccess = (result: MidtransStatusResponse): void => {
         console.log("Payment completed successfully", result.order_id);
         setError(null);
+        setLoading(false);
+        processingRef.current = false;
         window.location.href = window.location.origin + "/invoice"
     }
 
     const onPaymentPending = (result: MidtransStatusResponse): void => {
         console.log("Payment is pending", result.order_id);
         setError(null);
+        setLoading(false);
+        processingRef.current = false;
     }
 
     const onPaymentFailed = (result: MidtransStatusResponse): void => {
         console.log("Payment failed:", result.order_id);
         setError("Payment was unsuccessful. Please try again.");
+        setLoading(false);
+        processingRef.current = false;
     }
 
     const clearError = (): void => {
