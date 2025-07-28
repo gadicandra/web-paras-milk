@@ -14,7 +14,9 @@ export async function POST(request: NextRequest) {
 
         function createItemDetails(body: ShoppingCart){
             let totalAmount = 0;
-            const cartId = body.items[0].id
+            const timestamp = Date.now();
+            const random= Math.random().toString(36).substring(2,15);
+            const orderId = `ORD-${timestamp}-${random}`
 
             const itemDetails = body.items.map(product => {
                 const { variant, quantity} = product
@@ -29,14 +31,14 @@ export async function POST(request: NextRequest) {
                 }
             })
 
-            return { cartId, itemDetails, totalAmount }
+            return { orderId, itemDetails, totalAmount }
         }
 
-        const { cartId, itemDetails, totalAmount } = createItemDetails(body)
+        const { orderId, itemDetails, totalAmount } = createItemDetails(body)
         const parameter = {
             item_details: itemDetails,
             transaction_details: {
-                order_id: cartId,
+                order_id: orderId,
                 gross_amount: totalAmount
             }
         }
