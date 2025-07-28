@@ -29,6 +29,20 @@ export default function Checkout({ cart }: { cart: ShoppingCart | null }){
             setError(null);
 
             try {
+                console.log('Cart exists:', !!cart);
+                console.log('Cart data:', cart);
+                console.log('Cart items count:', cart?.items?.length || 0);
+                console.log('Cart data being sent:', cart);
+                console.log('Cart stringified:', JSON.stringify(cart));
+
+                if (!cart) {
+                    throw new Error('Cart is empty or undefined');
+                }
+
+                if (!cart.items || cart.items.length === 0) {
+                    throw new Error('No items in cart');
+                }
+
                 const response = await fetch("/api/tokenizer", {
                     method: "POST",
                     headers: {
@@ -37,8 +51,11 @@ export default function Checkout({ cart }: { cart: ShoppingCart | null }){
                     body: JSON.stringify(cart)
                 });
 
-                console.log('Response status:', response.status)
-                console.log('Response status:', response.ok)
+                console.log('=== RESPONSE DEBUG ===');
+                console.log('Response status:', response.status);
+                console.log('Response ok:', response.ok);
+                console.log('Response statusText:', response.statusText);
+                console.log('Response headers:', Object.fromEntries(response.headers.entries()));
 
                 if (!response.ok) {
                     const errorText = await response.text();
@@ -72,12 +89,31 @@ export default function Checkout({ cart }: { cart: ShoppingCart | null }){
                     }
                 })
             } catch(err){
-                const errorMessage = err instanceof Error? err.message : "Unknown error occured";
-                console.log("Checkout error:", errorMessage);
+                console.log('=== ERROR DEBUG ===');
+                console.error("Full error object:", err);
+                
+                let errorMessage = "Unknown error occurred";
+                
+                if (err instanceof Error) {
+                    errorMessage = err.message;
+                    console.error("Error name:", err.name);
+                    console.error("Error stack:", err.stack);
+                } else {
+                    console.error("Non-Error thrown:", err);
+                }
+
+                // Handle specific error types
+                if (errorMessage.includes('AbortError')) {
+                    errorMessage = 'Request timeout. Please check your connection and try again.';
+                } else if (errorMessage.includes('NetworkError') || errorMessage.includes('Failed to fetch')) {
+                    errorMessage = 'Network error. Please check your connection.';
+                }
+
+                console.log("Final error message:", errorMessage);
                 setError(errorMessage);
                 setLoading(false);
             } finally {
-                console.log("...")
+                console.log("=== CHECKOUT DEBUG END ===");
             }
         };
 
