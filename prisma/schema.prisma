@@ -33,11 +33,13 @@ model ProductVariant {
 
 model Transaction {
   id              Int                 @id @default(autoincrement())
+  userId          String              @map("user_id")
   transactionDate DateTime            @default(now()) @map("transaction_date")
   totalAmount     Int                 @map("total_amount")
   status          String
   paymentMethod   String              @map("payment_method")
   details         TransactionDetail[]
+  user            User?               @relation(fields: [userId], references: [id])
 
   @@map("transaction")
 }
@@ -50,18 +52,32 @@ model TransactionDetail {
   price         Decimal
   subTotal      Decimal
   transaction   Transaction    @relation(fields: [transactionId], references: [id])
-  variant          ProductVariant @relation(fields: [variantId], references: [id])
+  variant       ProductVariant @relation(fields: [variantId], references: [id])
 
   @@map("transaction_detail")
 }
 
+model SnapShotCart {
+  id        Int  @id @default(autoincrement())
+  sessionId String
+  userId    String
+  variantId Int
+  quantity  Int
+  priceSnapshot Decimal
+  subTotal Decimal
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+
+  @@map("snapshotcart")
+}
+
 model Cart {
-  id        Int        @id @default(autoincrement())
-  createdAt DateTime   @default(now()) @map("created_at")
-  updatedAt DateTime   @updatedAt @map("updated_at")
-  userId    String?    @map("user_id")
-  items     CartItem[]
-  user      User?      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id           Int            @id @default(autoincrement())
+  createdAt    DateTime       @default(now()) @map("created_at")
+  updatedAt    DateTime       @updatedAt @map("updated_at")
+  userId       String?        @map("user_id")
+  items        CartItem[]
+  user         User?          @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("carts")
 }
@@ -90,6 +106,7 @@ model User {
   Authenticator Authenticator[]
   sessions      Session[]
   Cart          Cart[]
+  Transaction   Transaction[]
 }
 
 model Account {

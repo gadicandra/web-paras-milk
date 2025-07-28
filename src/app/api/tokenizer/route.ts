@@ -1,6 +1,8 @@
 import Midtrans from "midtrans-client-typescript"
 import { NextRequest, NextResponse } from "next/server";
 import { ShoppingCart } from "../../../../lib/cart";
+import CreateSnapShot from "../../../../lib/snapShotCart";
+
 
 const snap = new Midtrans.Snap({
     isProduction: Boolean(process.env.MIDTRANS_IS_PRODUCTION),
@@ -34,7 +36,8 @@ export async function POST(request: NextRequest) {
             return { orderId, itemDetails, totalAmount }
         }
 
-        const { orderId, itemDetails, totalAmount } = createItemDetails(body)
+        const { orderId, itemDetails, totalAmount } = await createItemDetails(body)
+        CreateSnapShot(orderId, body)
         const parameter = {
             item_details: itemDetails,
             transaction_details: {
@@ -42,7 +45,7 @@ export async function POST(request: NextRequest) {
                 gross_amount: totalAmount
             }
         }
-
+    
         const token = await snap.createTransactionToken(parameter);
         console.log(token)
 
