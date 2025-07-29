@@ -99,6 +99,7 @@ export interface MidtransStatusResponse {
     va_numbers?: VANumber[];
     pdf_url?: string;
     finish_redirect_url?: string;
+    signature_key? : string;
 }
 
 export interface SnapOptions {

@@ -58,15 +58,17 @@ model TransactionDetail {
 }
 
 model SnapShotCart {
-  id        Int  @id @default(autoincrement())
-  sessionId String
-  userId    String
-  variantId Int
-  quantity  Int
+  id            Int      @id @default(autoincrement())
+  sessionId     String
+  userId        String
+  cartId        Int
+  variantId     Int
+  quantity      Int
   priceSnapshot Decimal
-  subTotal Decimal
-  createdAt DateTime @default(now())
-  expiresAt DateTime
+  subTotal      Decimal
+  createdAt     DateTime @default(now())
+  expiresAt     DateTime
+  cart          Cart     @relation(fields: [cartId], references: [id])
 
   @@map("snapshotcart")
 }
@@ -78,6 +80,7 @@ model Cart {
   userId       String?        @map("user_id")
   items        CartItem[]
   user         User?          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  SnapShotCart SnapShotCart[]
 
   @@map("carts")
 }

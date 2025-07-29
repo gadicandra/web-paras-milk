@@ -12,6 +12,7 @@
     "@auth/prisma-adapter": "^2.10.0",
     "@prisma/client": "^6.11.0",
     "axios": "^1.11.0",
+    "crypto": "^1.0.1",
     "daisyui": "^5.0.43",
     "eslint-config-prettier": "^10.1.5",
     "midtrans-client-typescript": "^1.4.3",

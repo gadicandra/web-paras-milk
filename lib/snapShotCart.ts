@@ -13,7 +13,7 @@ export default async function CreateSnapShot(orderId: string, body: ShoppingCart
     }
     
     for (const item of body.items){
-        const { variant, quantity} = item
+        const { variant, quantity, cartId} = item
         await prisma.snapShotCart.create({
             data: {
                 sessionId: orderId,
@@ -22,7 +22,8 @@ export default async function CreateSnapShot(orderId: string, body: ShoppingCart
                 quantity: quantity,
                 priceSnapshot: variant.price,
                 subTotal: quantity * variant.price,
-                expiresAt: oneHourFromNow
+                expiresAt: oneHourFromNow,
+                cartId: cartId
             }
         })
     }

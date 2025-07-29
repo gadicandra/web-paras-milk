@@ -43,6 +43,9 @@ export async function POST(request: NextRequest) {
             transaction_details: {
                 order_id: orderId,
                 gross_amount: totalAmount
+            },
+            callbacks: {
+                notification_url: 'https://parasmilk.vercel.app/api/webhook/midtrans'
             }
         }
     
