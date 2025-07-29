@@ -35,7 +35,7 @@ export default function CartEntry({cartItem: {variant, quantity}}: CartEntryProp
                     />}
                 </div>
                 <div>
-                    <Link href={"/order-menu" + variant.id} className="font-bold">
+                    <Link href={"/order-menu/" + variant.id} className="font-bold">
                         {variant.name}
                     </Link>
                     <div>Price: {formatPrice(variant.price)}</div>
