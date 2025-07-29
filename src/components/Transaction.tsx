@@ -13,6 +13,7 @@ export default function TransactionCard({transaction}: TransactionProps){
         day: 'numeric',     // e.g., "29"
         hour: '2-digit',    // e.g., "21" (format 24 jam)
         minute: '2-digit',  // e.g., "45"
+        timeZone: 'Asia/Jakarta',
         timeZoneName: 'short' // e.g., "WIB"
     } as const;
     const formattedString = transaction.transactionDate.toLocaleString('id-ID', options)
