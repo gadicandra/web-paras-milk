@@ -43,6 +43,10 @@ export async function POST(request: NextRequest) {
         } catch (snapshotError) {
             console.error('Error creating snapshot:', snapshotError);
         }
+
+        console.log(itemDetails)
+        console.log(orderId)
+        console.log(totalAmount)
         const parameter = {
             item_details: itemDetails,
             transaction_details: {
@@ -51,7 +55,7 @@ export async function POST(request: NextRequest) {
             }
         }
 
-        console.log(parameter);
+        console.log(parameter)
     
         const token = await snap.createTransactionToken(parameter);
         console.log(token)
