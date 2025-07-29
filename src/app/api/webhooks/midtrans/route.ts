@@ -69,7 +69,7 @@ async function handlePaymentSuccess(sessionId: string){
                 }
             })
 
-            console.log(`Transaction created with ID: ${transaction.id}`);
+            console.log(`Transaction created with ID: ${transaction.sessionId}`);
 
             const deletedCount = await tx.snapShotCart.deleteMany({
                 where: { sessionId }
