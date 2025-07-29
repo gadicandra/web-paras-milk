@@ -4,7 +4,7 @@ import { prisma } from "../../../../../lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 import { getPaymentStatusGroup, MidtransError, validateMidtransResponse } from "../../../../../utils/midtrans";
 
-const MIDTRANS_SERVER_KEY = process.env.MIDTRANS_SERVER_KEY;
+const MIDTRANS_SERVER_KEY = process.env.MIDTRANS_SERVER_KEY as string;
 
 function validateSignature(payload: MidtransStatusResponse): boolean {
     const { order_id, status_code, gross_amount, signature_key } = payload;
@@ -14,12 +14,45 @@ function validateSignature(payload: MidtransStatusResponse): boolean {
         return false;
     }
 
+    // --- Langkah Debugging Dimulai Di Sini ---
+
+    console.log('--- DEBUGGING SIGNATURE VALIDATION ---');
+    console.log('1. Data dari Payload:');
+    console.log(`   - order_id:       ${order_id}`);
+    console.log(`   - status_code:    ${status_code}`);
+    console.log(`   - gross_amount:   ${gross_amount}`);
+    
+    // PENTING: Jangan log seluruh kunci di produksi. 
+    // Ini aman untuk development lokal.
+    console.log('2. Server Key yang Digunakan:');
+    console.log(`   - MIDTRANS_SERVER_KEY: ${MIDTRANS_SERVER_KEY}`);
+
+    // 3. Membuat String untuk di-Hash
+    const stringToHash = order_id + status_code + gross_amount + MIDTRANS_SERVER_KEY;
+    console.log('3. String yang Akan Di-hash:');
+    console.log(`   - "${stringToHash}"`);
+
+    // 4. Menghitung Signature di Server Anda
     const calculatedSignature = crypto
         .createHash('sha512')
-        .update( order_id + status_code + gross_amount + MIDTRANS_SERVER_KEY)
-        .digest('hex')
+        .update(stringToHash)
+        .digest('hex');
+    console.log('4. Hasil Perhitungan (Calculated Signature):');
+    console.log(`   - ${calculatedSignature}`);
 
-    return calculatedSignature === signature_key;
+    // 5. Signature yang Diterima dari Midtrans
+    console.log('5. Signature dari Midtrans:');
+    console.log(`   - ${signature_key}`);
+
+    // 6. Melakukan Perbandingan
+    const isSignatureValid = calculatedSignature === signature_key;
+    console.log('6. Hasil Perbandingan (Apakah Cocok?):');
+    console.log(`   - ${isSignatureValid ? '✅ YA, COCOK' : '❌ TIDAK, BERBEDA'}`);
+    console.log('--- AKHIR DEBUGGING ---');
+    
+    // --- Langkah Debugging Selesai ---
+
+    return isSignatureValid;
 }
 
 async function handlePaymentSuccess(sessionId: string){
