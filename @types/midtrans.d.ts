@@ -86,23 +86,20 @@ export interface MidtransStatusResponse {
     status_code: string;
     status_message: string;
     transaction_id: string;
-    store? : string
     order_id: string;
     merchant_id: string;
     gross_amount: string;
     currency: string;
     payment_type: PaymentType;
-    payment_code: string;
     transaction_time: string;
-    transaction_status: TransactionStatus;
+    transaction_status: TransactionStatus
     settlement_time?: string;
-    fraud_status: FraudStatus;
-    expiry_time?: string;
+    fraud_status: FraudStatus
     bank?: string;
     va_numbers?: VANumber[];
     pdf_url?: string;
     finish_redirect_url?: string;
-    signature_key : string;
+    signature_key? : string;
 }
 
 export interface SnapOptions {
