@@ -38,22 +38,6 @@ const validateEnvVars = () => {
 
 export async function POST(request: NextRequest) {
     try{
-
-        const envVars = validateEnvVars();
-        
-        console.log('Initializing Midtrans Snap with:');
-        console.log('- isProduction:', envVars.isProduction === 'true');
-        console.log('- serverKey prefix:', envVars.serverKey?.substring(0, 6) + '...');
-        console.log('- clientKey prefix:', envVars.clientKey?.substring(0, 6) + '...');
-
-        // Initialize Midtrans Snap dengan error handling
-        try {
-            console.log('Midtrans Snap initialized successfully');
-        } catch (snapError) {
-            console.error('Error initializing Midtrans Snap:', snapError);
-            throw new Error(`Failed to initialize Midtrans: ${snapError}`);
-        }
-
         const body: ShoppingCart = await request.json()
 
         function createItemDetails(body: ShoppingCart){
@@ -101,6 +85,12 @@ export async function POST(request: NextRequest) {
         }
         return NextResponse.json({ token })
     } catch (error){
+        const envVars = validateEnvVars();
+        
+        console.log('Initializing Midtrans Snap with:');
+        console.log('- isProduction:', envVars.isProduction === 'true');
+        console.log('- serverKey prefix:', envVars.serverKey?.substring(0, 6) + '...');
+        console.log('- clientKey prefix:', envVars.clientKey?.substring(0, 6) + '...');
         console.error("Error creating Midtrans token:", error);
         const errorMessage = error instanceof Error ? error.message : "Unknown error";
         return NextResponse.json(
