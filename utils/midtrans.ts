@@ -100,6 +100,7 @@ export const validateMidtransResponse = (obj: unknown): MidtransStatusResponse =
     const bank = getStringProperty(obj, 'bank');
     const pdfUrl = getStringProperty(obj, 'pdf_url');
     const finishRedirectUrl = getStringProperty(obj, 'finish_redirect_url');
+    const signatureKey = getStringProperty(obj, 'signature_key');
 
     // Handle VA numbers if present
     let vaNumbers;
@@ -136,7 +137,8 @@ export const validateMidtransResponse = (obj: unknown): MidtransStatusResponse =
         ...(bank && { bank: bank }),
         ...(vaNumbers && { va_numbers: vaNumbers }),
         ...(pdfUrl && { pdf_url: pdfUrl }),
-        ...(finishRedirectUrl && { finish_redirect_url: finishRedirectUrl })
+        ...(finishRedirectUrl && { finish_redirect_url: finishRedirectUrl }),
+        ...(signatureKey && { signature_key: signatureKey})
     };
 
     return validatedResponse;
