@@ -14,44 +14,14 @@ function validateSignature(payload: MidtransStatusResponse): boolean {
         return false;
     }
 
-    // --- Langkah Debugging Dimulai Di Sini ---
-
-    console.log('--- DEBUGGING SIGNATURE VALIDATION ---');
-    console.log('1. Data dari Payload:');
-    console.log(`   - order_id:       ${order_id}`);
-    console.log(`   - status_code:    ${status_code}`);
-    console.log(`   - gross_amount:   ${gross_amount}`);
-    
-    // PENTING: Jangan log seluruh kunci di produksi. 
-    // Ini aman untuk development lokal.
-    console.log('2. Server Key yang Digunakan:');
-    console.log(`   - MIDTRANS_SERVER_KEY: ${MIDTRANS_SERVER_KEY}`);
-
-    // 3. Membuat String untuk di-Hash
     const stringToHash = order_id + status_code + gross_amount + MIDTRANS_SERVER_KEY;
-    console.log('3. String yang Akan Di-hash:');
-    console.log(`   - "${stringToHash}"`);
 
-    // 4. Menghitung Signature di Server Anda
     const calculatedSignature = crypto
         .createHash('sha512')
         .update(stringToHash)
         .digest('hex');
-    console.log('4. Hasil Perhitungan (Calculated Signature):');
-    console.log(`   - ${calculatedSignature}`);
 
-    // 5. Signature yang Diterima dari Midtrans
-    console.log('5. Signature dari Midtrans:');
-    console.log(`   - ${signature_key}`);
-
-    // 6. Melakukan Perbandingan
     const isSignatureValid = calculatedSignature === signature_key;
-    console.log('6. Hasil Perbandingan (Apakah Cocok?):');
-    console.log(`   - ${isSignatureValid ? '✅ YA, COCOK' : '❌ TIDAK, BERBEDA'}`);
-    console.log('--- AKHIR DEBUGGING ---');
-    
-    // --- Langkah Debugging Selesai ---
-
     return isSignatureValid;
 }
 
@@ -81,6 +51,7 @@ async function handlePaymentSuccess(sessionId: string){
             const transaction = await tx.transaction.create({
                 data: {
                     userId,
+                    sessionId: sessionId,
                     totalAmount: Math.round(totalAmount),
                     status: 'completed',
                     paymentMethod: 'midtrans',
@@ -114,7 +85,7 @@ async function handlePaymentSuccess(sessionId: string){
             console.log(`Cleared ${clearedCartItems.count} cart items`);
 
             return {
-                transactionId: transaction.id,
+                sessionId: transaction.sessionId,
                 itemProcessed: snapshotItems.length,
                 cartCleared: clearedCartItems.count
             }

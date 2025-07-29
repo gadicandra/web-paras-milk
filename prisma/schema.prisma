@@ -32,7 +32,7 @@ model ProductVariant {
 }
 
 model Transaction {
-  id              Int                 @id @default(autoincrement())
+  sessionId       String                 @id
   userId          String              @map("user_id")
   transactionDate DateTime            @default(now()) @map("transaction_date")
   totalAmount     Int                 @map("total_amount")
@@ -45,14 +45,14 @@ model Transaction {
 }
 
 model TransactionDetail {
-  id            Int            @id @default(autoincrement())
-  transactionId Int            @map("transaction_id")
-  variantId     Int            @map("variant_id")
-  quantity      Int
-  price         Decimal
-  subTotal      Decimal
-  transaction   Transaction    @relation(fields: [transactionId], references: [id])
-  variant       ProductVariant @relation(fields: [variantId], references: [id])
+  id          Int            @id @default(autoincrement())
+  sessionId   String            @map("session_id")
+  variantId   Int            @map("variant_id")
+  quantity    Int
+  price       Decimal
+  subTotal    Decimal
+  transaction Transaction    @relation(fields: [sessionId], references: [sessionId])
+  variant     ProductVariant @relation(fields: [variantId], references: [id])
 
   @@map("transaction_detail")
 }
