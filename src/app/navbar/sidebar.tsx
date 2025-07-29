@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react";
-
+import Link from "next/link";
 export default function Sidebar(){
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     return(
@@ -16,10 +16,12 @@ export default function Sidebar(){
         <aside
         className={`rounded-tr-4xl fixed top-0 left-0 z-70 h-screen w-[232px] transform bg-[#1D3023] ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"} transition-transform duration-300 ease-in-out`}
         >
-        <div className="flex bg-[1D3023]">
-            <div className="flex-col "></div>
-            <div className="flex-col bg-[#FAF5E1]"></div>
-        </div>
+            <div className="flex bg-[1D3023]">
+                <div className="flex-col">
+                    <Link href="/transaction-history">Transaction History</Link>
+                </div>
+                <div className="flex-col bg-[#FAF5E1]"></div>
+            </div>
         </aside>
         {/* Backdrop */}
         {isSidebarOpen && (
