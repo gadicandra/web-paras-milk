@@ -4,7 +4,7 @@ import { prisma } from "../../../../../lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 import { getPaymentStatusGroup, MidtransError, validateMidtransResponse } from "../../../../../utils/midtrans";
 
-const MIDTRANS_SERVER_KEY = process.env.MIDTRANS_SERVER_KEY as string;
+const MIDTRANS_SERVER_KEY = process.env.MIDTRANS_SERVER_KEY;
 
 function validateSignature(payload: MidtransStatusResponse): boolean {
     const { order_id, status_code, gross_amount, signature_key } = payload;
