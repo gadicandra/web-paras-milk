@@ -1,8 +1,8 @@
 {
   "crons": [
     {
-      "path": "/api/cron/cleanup-snapshots",
-      "schedule": "*/30 * * * *"
+      "path": "/api/cron",
+      "schedule": "0 10 * * *"
     }
   ],
   "redirects": [

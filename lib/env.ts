@@ -6,8 +6,6 @@ const envSchema = z.object({
     GOOGLE_CLIENT_SECRET: z.string().nonempty(),
     NEXTAUTH_URL: z.string().nonempty(),
     NEXTAUTH_SECRET: z.string().nonempty(),
-    NEXT_PUBLIC_CLIENT: z.string().nonempty(),
-    SECRET: z.string().nonempty(),
 });
 
 export const env = envSchema.parse(process.env)

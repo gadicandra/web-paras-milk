@@ -5,7 +5,7 @@ import { useEffect } from "react"
 export default function SnapMidtrans(){
     useEffect(() => {
         const snapScript = "https://app.sandbox.midtrans.com/snap/snap.js"
-        const clientKey = process.env.NEXT_PUBLIC_CLIENT!
+        const clientKey = process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY!
         const script = document.createElement('script')
         script.src = snapScript
         script.setAttribute('data-client-key', clientKey)

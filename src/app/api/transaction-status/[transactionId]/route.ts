@@ -25,7 +25,7 @@ export async function GET(
     }
 
     try {
-        const serverKey = process.env.SECRET as string;
+        const serverKey = process.env.MIDTRANS_SERVER_KEY as string;
         const isProduction = Boolean(process.env.MIDTRANS_IS_PRODUCTION);
         
         console.log('Server key exists:', !!serverKey);

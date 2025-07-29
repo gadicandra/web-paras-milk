@@ -6,8 +6,8 @@ import CreateSnapShot from "../../../../lib/snapShotCart";
 
 const snap = new Midtrans.Snap({
     isProduction: Boolean(process.env.MIDTRANS_IS_PRODUCTION),
-    serverKey: process.env.SECRET,
-    clientKey: process.env.NEXT_PUBLIC_CLIENT
+    serverKey: process.env.MIDTRANS_SERVER_KEY,
+    clientKey: process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY
 })
 
 export async function POST(request: NextRequest) {
