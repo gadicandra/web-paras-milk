@@ -50,6 +50,8 @@ export async function POST(request: NextRequest) {
                 gross_amount: totalAmount
             }
         }
+
+        console.log(parameter);
     
         const token = await snap.createTransactionToken(parameter);
         console.log(token)
