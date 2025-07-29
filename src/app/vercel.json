@@ -4,24 +4,5 @@
       "path": "/api/cron/cleanup-snapshots",
       "schedule": "*/30 * * * *"
     }
-  ],
-  "functions": {
-    "app/api/webhook/midtrans/route.ts": {
-      "maxDuration": 30
-    }
-  },
-  "rewrites": [],
-  "redirects": [
-    {
-      "source": "/api/webhook/midtrans",
-      "destination": "/api/webhook/midtrans/",
-      "permanent": false,
-      "has": [
-        {
-          "type": "method",
-          "value": "GET"
-        }
-      ]
-    }
   ]
 }
