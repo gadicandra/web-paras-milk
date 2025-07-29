@@ -10,8 +10,50 @@ const snap = new Midtrans.Snap({
     clientKey: process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY
 })
 
+const validateEnvVars = () => {
+    console.log('=== ENVIRONMENT VARIABLES DEBUG ===');
+    console.log('MIDTRANS_SERVER_KEY exists:', !!process.env.MIDTRANS_SERVER_KEY);
+    console.log('NEXT_PUBLIC_MIDTRANS_CLIENT_KEY exists:', !!process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY);
+    console.log('MIDTRANS_IS_PRODUCTION:', process.env.MIDTRANS_IS_PRODUCTION);
+    
+    if (process.env.MIDTRANS_SERVER_KEY) {
+        console.log('Server key prefix:', process.env.MIDTRANS_SERVER_KEY.substring(0, 3));
+        console.log('Server key length:', process.env.MIDTRANS_SERVER_KEY.length);
+    }
+    
+    if (process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY) {
+        console.log('Client key prefix:', process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY.substring(0, 3));
+        console.log('Client key length:', process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY.length);
+    }
+    
+    const requiredVars = {
+        serverKey: process.env.MIDTRANS_SERVER_KEY,
+        clientKey: process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY,
+        isProduction: process.env.MIDTRANS_IS_PRODUCTION
+    };
+
+    console.log('All environment variables validated successfully');
+    return requiredVars;
+};
+
 export async function POST(request: NextRequest) {
     try{
+
+        const envVars = validateEnvVars();
+        
+        console.log('Initializing Midtrans Snap with:');
+        console.log('- isProduction:', envVars.isProduction === 'true');
+        console.log('- serverKey prefix:', envVars.serverKey?.substring(0, 6) + '...');
+        console.log('- clientKey prefix:', envVars.clientKey?.substring(0, 6) + '...');
+
+        // Initialize Midtrans Snap dengan error handling
+        try {
+            console.log('Midtrans Snap initialized successfully');
+        } catch (snapError) {
+            console.error('Error initializing Midtrans Snap:', snapError);
+            throw new Error(`Failed to initialize Midtrans: ${snapError}`);
+        }
+
         const body: ShoppingCart = await request.json()
 
         function createItemDetails(body: ShoppingCart){
@@ -37,15 +79,17 @@ export async function POST(request: NextRequest) {
         }
 
         const { orderId, itemDetails, totalAmount } = await createItemDetails(body)
-        CreateSnapShot(orderId, body)
+        try {
+            await CreateSnapShot(orderId, body);
+            console.log('Snapshot created successfully for order:', orderId);
+        } catch (snapshotError) {
+            console.error('Error creating snapshot:', snapshotError);
+        }
         const parameter = {
             item_details: itemDetails,
             transaction_details: {
                 order_id: orderId,
                 gross_amount: totalAmount
-            },
-            callbacks: {
-                notification_url: 'https://parasmilk.vercel.app/api/webhook/midtrans'
             }
         }
     
