@@ -78,7 +78,7 @@ export async function POST(request: NextRequest) {
             return { orderId, itemDetails, totalAmount }
         }
 
-        const { orderId, itemDetails, totalAmount } = await createItemDetails(body)
+        const { orderId, itemDetails, totalAmount } = createItemDetails(body)
         try {
             await CreateSnapShot(orderId, body);
             console.log('Snapshot created successfully for order:', orderId);
